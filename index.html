@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="page-title">Minesweeper Game - Play Online for Free</title>
+    <meta name="description" content="Play Minesweeper online for free! Choose from easy, medium, and hard difficulties. Enjoy this classic puzzle game in multiple languages.">
+    <meta name="keywords" content="minesweeper, online game, free game, puzzle game, multi-language">
+    <meta name="author" content="Your Name">
+    <!-- Open Graph for social media -->
+    <meta property="og:title" content="Minesweeper Game - Play Online for Free">
+    <meta property="og:description" content="Play Minesweeper online for free! Choose from easy, medium, and hard difficulties.">
+    <meta property="og:url" content="https://您的用户名.github.io">
+    <meta property="og:type" content="website">
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Minesweeper Game - Play Online for Free">
+    <meta name="twitter:description" content="Play Minesweeper online for free! Choose from easy, medium, and hard difficulties.">
+    <!-- Hreflang for multi-language -->
+    <link rel="alternate" hreflang="en" href="https://您的用户名.github.io/en/">
+    <link rel="alternate" hreflang="zh" href="https://您的用户名.github.io/zh/">
+    <link rel="alternate" hreflang="es" href="https://您的用户名.github.io/es/">
+    <link rel="alternate" hreflang="fr" href="https://您的用户名.github.io/fr/">
+    <link rel="alternate" hreflang="ar" href="https://您的用户名.github.io/ar/">
+    <link rel="alternate" hreflang="ru" href="https://您的用户名.github.io/ru/">
+    <link rel="alternate" hreflang="ja" href="https://您的用户名.github.io/ja/">
+    <link rel="alternate" hreflang="pt" href="https://您的用户名.github.io/pt/">
+    <link rel="alternate" hreflang="it" href="https://您的用户名.github.io/it/">
+    <link rel="alternate" hreflang="de" href="https://您的用户名.github.io/de/">
+    <style>
+        body { 
+            display: flex; 
+            justify-content: center; 
+            align-items: flex-start; 
+            min-height: 100vh; 
+            background-color: #f0f0f0; 
+            font-family: Arial, sans-serif; 
+            margin: 0; 
+            padding: 20px; 
+        }
+        #game-container { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            text-align: center; 
+            direction: ltr; 
+        }
+        #grid-container { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            padding-bottom: 40px; /* 增加底部填充，确保消息有足够空间 */
+        }
+        #grid { 
+            display: grid; 
+            margin-top: 20px; 
+            border: 1px solid #000; 
+            direction: ltr; 
+        }
+        .cell { 
+            background-color: #ccc; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            cursor: pointer; 
+            border: 1px solid #999; 
+            width: 30px; 
+            height: 30px; 
+            font-size: 15px; 
+        }
+        .revealed { 
+            background-color: #fff; 
+            cursor: default; 
+            border: 1px solid #ddd; 
+        }
+        .mine { 
+            background-color: red; 
+        }
+        .flagged { 
+            background-color: #ffcc00; 
+        }
+        [lang="ar"] #game-container { 
+            direction: rtl; 
+        }
+        #message { 
+            margin-top: 30px; /* 增大顶部间距，避免遮挡 */
+            font-size: 16px; 
+            color: #333; 
+            min-height: 20px; /* 确保有足够高度显示文本 */
+        }
+        #tip { 
+            margin-top: 10px; 
+            font-size: 14px; 
+            color: #666; 
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <h1 id="game-title">Minesweeper Game</h1>
+        <select id="language">
+            <option value="en">English</option>
+            <option value="zh">中文</option>
+            <option value="es">Español</option>
+            <option value="fr">Français</option>
+            <option value="ar">العربية</option>
+            <option value="ru">Русский</option>
+            <option value="ja">日本語</option>
+            <option value="pt">Português</option>
+            <option value="it">Italiano</option>
+            <option value="de">Deutsch</option>
+        </select>
+        <select id="difficulty">
+            <option value="low" data-lang="difficulty_low">Low Difficulty (9x9, 10 mines)</option>
+            <option value="medium" data-lang="difficulty_medium">Medium Difficulty (16x16, 40 mines)</option>
+            <option value="high" data-lang="difficulty_high">High Difficulty (20x20, 99 mines)</option>
+        </select>
+        <button id="start-button">Start Game</button>
+        <div id="grid-container">
+            <div id="grid"></div>
+            <p id="message"></p>
+            <p id="tip">Tip: Use two-finger tap on trackpad to mark or unmark a mine.</p>
+        </div>
+    </div>
+
+    <script>
+        const translations = {
+            en: {
+                page_title: "Minesweeper Game - Play Online for Free",
+                game_title: "Minesweeper Game",
+                difficulty_low: "Low Difficulty (9x9, 10 mines)",
+                difficulty_medium: "Medium Difficulty (16x16, 40 mines)",
+                difficulty_high: "High Difficulty (20x20, 99 mines)",
+                start_button: "Start Game",
+                message_lose: "Game Over! You hit a mine.",
+                message_win: "Congratulations! You won!",
+                tip: "Tip: Use two-finger tap on trackpad to mark or unmark a mine."
+            },
+            zh: {
+                page_title: "扫雷游戏 - 在线免费玩",
+                game_title: "扫雷游戏",
+                difficulty_low: "低难度 (9x9, 10 个地雷)",
+                difficulty_medium: "中难度 (16x16, 40 个地雷)",
+                difficulty_high: "高难度 (20x20, 99 个地雷)",
+                start_button: "开始游戏",
+                message_lose: "游戏结束！你踩到地雷了。",
+                message_win: "恭喜你！你赢了！",
+                tip: "提示：使用触控板的双指点击来标记或取消标记地雷。"
+            },
+            es: {
+                page_title: "Juego de Buscaminas - Juega Gratis en Línea",
+                game_title: "Juego de Buscaminas",
+                difficulty_low: "Dificultad Baja (9x9, 10 minas)",
+                difficulty_medium: "Dificultad Media (16x16, 40 minas)",
+                difficulty_high: "Dificultad Alta (20x20, 99 minas)",
+                start_button: "Iniciar Juego",
+                message_lose: "¡Juego Terminado! Pisaste una mina.",
+                message_win: "¡Felicidades! ¡Ganaste!",
+                tip: "Consejo: Usa el toque con dos dedos en el trackpad para marcar o desmarcar una mina."
+            },
+            fr: {
+                page_title: "Jeu de Démineur - Jouez Gratuitement en Ligne",
+                game_title: "Jeu de Démineur",
+                difficulty_low: "Difficulté Faible (9x9, 10 mines)",
+                difficulty_medium: "Difficulté Moyenne (16x16, 40 mines)",
+                difficulty_high: "Difficulté Élevée (20x20, 99 mines)",
+                start_button: "Démarrer le Jeu",
+                message_lose: "Partie Terminée ! Vous avez touché une mine.",
+                message_win: "Félicitations ! Vous avez gagné !",
+                tip: "Astuce : Utilisez un tap avec deux doigts sur le trackpad pour marquer ou démarquer une mine."
+            },
+            ar: {
+                page_title: "لعبة كاسحة الألغام - العب مجانًا على الإنترنت",
+                game_title: "لعبة كاسحة الألغام",
+                difficulty_low: "صعوبة منخفضة (9x9، 10 ألغام)",
+                difficulty_medium: "صعوبة متوسطة (16x16، 40 لغمًا)",
+                difficulty_high: "صعوبة عالية (20x20، 99 لغمًا)",
+                start_button: "ابدأ اللعبة",
+                message_lose: "انتهت اللعبة! لقد ضربت لغمًا.",
+                message_win: "تهانينا! لقد فزت!",
+                tip: "نصيحة: استخدم النقر بإصبعين على لوحة اللمس لتحديد أو إلغاء تحديد لغم."
+            },
+            ru: {
+                page_title: "Игра Сапёр - Играйте Онлайн Бесплатно",
+                game_title: "Игра Сапёр",
+                difficulty_low: "Низкая Сложность (9x9, 10 мин)",
+                difficulty_medium: "Средняя Сложность (16x16, 40 мин)",
+                difficulty_high: "Высокая Сложность (20x20, 99 мин)",
+                start_button: "Начать Игру",
+                message_lose: "Игра Окончена! Вы попали на мину.",
+                message_win: "Поздравляем! Вы выиграли!",
+                tip: "Совет: Используйте двойное касание на трекпаде, чтобы отметить или снять отметку с мины."
+            },
+            ja: {
+                page_title: "マインスイーパーゲーム - オンラインで無料プレイ",
+                game_title: "マインスイーパーゲーム",
+                difficulty_low: "低難易度 (9x9、10個の地雷)",
+                difficulty_medium: "中難易度 (16x16、40個の地雷)",
+                difficulty_high: "高難易度 (20x20、99個の地雷)",
+                start_button: "ゲーム開始",
+                message_lose: "ゲームオーバー！地雷を踏みました。",
+                message_win: "おめでとう！勝利しました！",
+                tip: "ヒント：トラックパッドで2本指タップして地雷をマークまたはマーク解除します。"
+            },
+            pt: {
+                page_title: "Jogo Campo Minado - Jogue Online Grátis",
+                game_title: "Jogo Campo Minado",
+                difficulty_low: "Dificuldade Baixa (9x9, 10 minas)",
+                difficulty_medium: "Dificuldade Média (16x16, 40 minas)",
+                difficulty_high: "Dificuldade Alta (20x20, 99 minas)",
+                start_button: "Iniciar Jogo",
+                message_lose: "Fim de Jogo! Você acertou uma mina.",
+                message_win: "Parabéns! Você venceu!",
+                tip: "Dica: Use o toque com dois dedos no trackpad para marcar ou desmarcar uma mina."
+            },
+            it: {
+                page_title: "Gioco Campo Minato - Gioca Online Gratis",
+                game_title: "Gioco Campo Minato",
+                difficulty_low: "Difficoltà Bassa (9x9, 10 mine)",
+                difficulty_medium: "Difficoltà Media (16x16, 40 mine)",
+                difficulty_high: "Difficoltà Alta (20x20, 99 mine)",
+                start_button: "Inizia Gioco",
+                message_lose: "Fine del Gioco! Hai colpito una mina.",
+                message_win: "Congratulazioni! Hai vinto!",
+                tip: "Suggerimento: Usa il tocco con due dita sul trackpad per segnare o rimuovere una mina."
+            },
+            de: {
+                page_title: "Minesweeper-Spiel - Online Kostenlos Spielen",
+                game_title: "Minesweeper-Spiel",
+                difficulty_low: "Niedriger Schwierigkeitsgrad (9x9, 10 Minen)",
+                difficulty_medium: "Mittlerer Schwierigkeitsgrad (16x16, 40 Minen)",
+                difficulty_high: "Hoher Schwierigkeitsgrad (20x20, 99 Minen)",
+                start_button: "Spiel Starten",
+                message_lose: "Spiel Ende! Du hast eine Mine getroffen.",
+                message_win: "Glückwunsch! Du hast gewonnen!",
+                tip: "Tipp: Verwende einen Zweifinger-Tipp auf dem Trackpad, um eine Mine zu markieren oder die Markierung aufzuheben."
+            }
+        };
+
+        let currentLang = 'en';
+        let gridSize, mineCount, grid = [], revealedCount = 0;
+        const cellSize = 30;
+
+        function updateLanguage(lang) {
+            currentLang = lang;
+            document.documentElement.lang = lang;
+            document.getElementById('page-title').textContent = translations[lang].page_title;
+            document.getElementById('game-title').textContent = translations[lang].game_title;
+            document.getElementById('start-button').textContent = translations[lang].start_button;
+            document.getElementById('tip').textContent = translations[lang].tip;
+
+            const difficultyOptions = document.querySelectorAll('#difficulty option');
+            difficultyOptions.forEach(option => {
+                const key = option.getAttribute('data-lang');
+                option.textContent = translations[lang][key];
+            });
+        }
+
+        document.getElementById('language').addEventListener('change', function() {
+            updateLanguage(this.value);
+            initGrid();
+        });
+
+        function setDifficulty(difficulty) {
+            switch (difficulty) {
+                case 'low': gridSize = 9; mineCount = 10; break;
+                case 'medium': gridSize = 16; mineCount = 40; break;
+                case 'high': gridSize = 20; mineCount = 99; break;
+                default: gridSize = 9; mineCount = 10;
+            }
+        }
+
+        function initGrid() {
+            const gridElement = document.getElementById('grid');
+            gridElement.innerHTML = '';
+            grid = [];
+            revealedCount = 0;
+            document.getElementById('message').textContent = '';
+            gridElement.style.gridTemplateColumns = `repeat(${gridSize}, ${cellSize}px)`;
+            gridElement.style.width = `${gridSize * cellSize}px`;
+            gridElement.style.height = `${gridSize * cellSize}px`;
+
+            for (let i = 0; i < gridSize; i++) {
+                grid[i] = [];
+                for (let j = 0; j < gridSize; j++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'cell';
+                    cell.dataset.row = i;
+                    cell.dataset.col = j;
+                    cell.addEventListener('click', handleCellClick);
+                    cell.addEventListener('contextmenu', handleCellRightClick);
+                    gridElement.appendChild(cell);
+                    grid[i][j] = { mine: false, revealed: false, flagged: false, adjacentMines: 0 };
+                }
+            }
+
+            let minesPlaced = 0;
+            while (minesPlaced < mineCount) {
+                const row = Math.floor(Math.random() * gridSize);
+                const col = Math.floor(Math.random() * gridSize);
+                if (!grid[row][col].mine) {
+                    grid[row][col].mine = true;
+                    minesPlaced++;
+                }
+            }
+
+            for (let i = 0; i < gridSize; i++) {
+                for (let j = 0; j < gridSize; j++) {
+                    if (!grid[i][j].mine) grid[i][j].adjacentMines = countAdjacentMines(i, j);
+                }
+            }
+        }
+
+        function countAdjacentMines(row, col) {
+            let count = 0;
+            for (let i = -1; i <= 1; i++) {
+                for (let j = -1; j <= 1; j++) {
+                    const r = row + i, c = col + j;
+                    if (r >= 0 && r < gridSize && c >= 0 && c < gridSize && grid[r][c].mine) count++;
+                }
+            }
+            return count;
+        }
+
+        function handleCellClick(event) {
+            const row = parseInt(event.target.dataset.row);
+            const col = parseInt(event.target.dataset.col);
+            if (grid[row][col].flagged) return;
+            revealCell(row, col);
+        }
+
+        function handleCellRightClick(event) {
+            event.preventDefault();
+            const row = parseInt(event.target.dataset.row);
+            const col = parseInt(event.target.dataset.col);
+            const cell = grid[row][col];
+            if (cell.revealed) return;
+            cell.flagged = !cell.flagged;
+            const cellElement = event.target;
+            if (cell.flagged) {
+                cellElement.classList.add('flagged');
+                cellElement.textContent = '🚩';
+            } else {
+                cellElement.classList.remove('flagged');
+                cellElement.textContent = '';
+            }
+        }
+
+        function revealCell(row, col) {
+            const cell = grid[row][col];
+            if (cell.revealed || cell.flagged) return;
+            cell.revealed = true;
+            revealedCount++;
+            const cellElement = document.querySelector(`.cell[data-row="${row}"][data-col="${col}"]`);
+            cellElement.classList.add('revealed');
+            if (cell.mine) {
+                cellElement.classList.add('mine');
+                cellElement.textContent = '💣';
+                document.getElementById('message').textContent = translations[currentLang].message_lose;
+                revealAllMines();
+            } else {
+                if (cell.adjacentMines > 0) {
+                    cellElement.textContent = cell.adjacentMines;
+                } else {
+                    for (let i = -1; i <= 1; i++) {
+                        for (let j = -1; j <= 1; j++) {
+                            const r = row + i, c = col + j;
+                            if (r >= 0 && r < gridSize && c >= 0 && c < gridSize) revealCell(r, c);
+                        }
+                    }
+                }
+                if (revealedCount === gridSize * gridSize - mineCount) {
+                    document.getElementById('message').textContent = translations[currentLang].message_win;
+                }
+            }
+        }
+
+        function revealAllMines() {
+            for (let i = 0; i < gridSize; i++) {
+                for (let j = 0; j < gridSize; j++) {
+                    if (grid[i][j].mine) {
+                        const cellElement = document.querySelector(`.cell[data-row="${i}"][data-col="${j}"]`);
+                        cellElement.classList.add('mine');
+                        cellElement.textContent = '💣';
+                    }
+                }
+            }
+        }
+
+        document.getElementById('start-button').addEventListener('click', function() {
+            const difficulty = document.getElementById('difficulty').value;
+            setDifficulty(difficulty);
+            initGrid();
+        });
+
+        setDifficulty('low');
+        initGrid();
+        updateLanguage('en');
+    </script>
+</body>
+</html>
