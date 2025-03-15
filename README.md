@@ -1,0 +1,2 @@
+# minesweeper
+free minesweeper game
